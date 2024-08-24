@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('https://i.pinimg.com/736x/ec/91/76/ec91769b32b9ad67c12d320a5535a701.jpg'); /* Reemplaza con la URL de tu imagen de fondo */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-container h1 {
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: #333;
+        }
+        .login-container input[type="text"] {
+            padding: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .login-container input[type="submit"] {
+            background-color: #ff6f61;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .login-container input[type="submit"]:hover {
+            background-color: #e65550;
+        }
+        .error-message {
+            color: #ff6f61;
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Login Pawmatch</h1>
+        <form id="loginForm">
+            <input type="text" id="dogName" placeholder="Enter your dog's name" required>
+            <input type="submit" value="Find Matches">
+            <div id="errorMessage" class="error-message">
+                Error: Dog name not found. Redirecting to registration...
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent form from submitting the traditional way
+            const dogName = document.getElementById('dogName').value;
+
+            // Always show an error and redirect to the registration page
+            document.getElementById('errorMessage').style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'registro.html'; // Redirect to registration page after showing error
+            }, 2000); // Wait 2 seconds before redirecting
+        });
+    </script>
+
+</body>
+</html>

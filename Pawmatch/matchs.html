@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches - Pawmatch</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('https://i.pinimg.com/736x/ec/91/76/ec91769b32b9ad67c12d320a5535a701.jpg'); /* Replace with your background image URL */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .header {
+            background-color: #ffffff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header .profile-menu {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            cursor: pointer;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .header .profile-menu img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        .matches-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .match-card {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .match-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-bottom: 2px solid #ddd;
+        }
+        .match-card .info {
+            padding: 15px;
+            text-align: center;
+        }
+        .match-card .info h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+        .match-card .info p {
+            margin: 5px 0;
+            color: #777;
+        }
+        .match-card .actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        .match-card .actions button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .match-card .actions .reject-btn {
+            color: #dc3545;
+        }
+        .match-card .actions button:hover {
+            color: #007bff;
+        }
+        .messages-icon {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            background: url('https://creazilla-store.fra1.digitaloceanspaces.com/icons/3203434/facebook-messenger-icon-md.png') no-repeat center;
+            background-size: 30px 30px;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .messages-sidebar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 300px;
+            height: 50vh;
+            background: #ffffff;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            border-top: 1px solid #ddd;
+        }
+        .messages-sidebar.active {
+            transform: translateY(0);
+        }
+        .messages-sidebar .close-btn {
+            font-size: 30px;
+            cursor: pointer;
+            color: #4a90e2;
+            margin-bottom: 15px;
+            display: block;
+            text-align: right;
+        }
+        .profile-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            max-width: 300px;
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        .profile-info.hidden {
+            transform: translateX(100%);
+        }
+        .profile-info img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #4a90e2;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+        .breed-link {
+            display: block;
+            text-align: center;
+            margin: 20px;
+            font-size: 16px;
+            color: #4a90e2;
+            text-decoration: none;
+        }
+        .breed-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Matches</h1>
+        <div class="profile-menu" onclick="toggleProfile()">
+            <img src="" id="profilePic" alt="Profile picture">
+        </div>
+    </div>
+    <div class="profile-info hidden" id="profileInfo">
+        <img src="" id="profileImg" alt="User profile picture">
+        <h2 id="profileName">Dog name</h2>
+        <p id="profileBreed">Breed</p>
+        <p id="profileAge">Age</p>
+        <p id="profileGender">Gender</p>
+    </div>
+    <div class="matches-container" id="matchesContainer">
+        <!-- Dog profiles will be inserted here using JavaScript -->
+    </div>
+    <a href="breed-images.html" class="breed-link">Look for images</a>
+    <div class="messages-icon" onclick="toggleMessages()">
+        <!-- The icon is loaded with the provided URL -->
+    </div>
+    <div class="messages-sidebar" id="messagesSidebar">
+        <span class="close-btn" onclick="toggleMessages()">✖</span>
+        <h2>Messages</h2>
+        <!-- Accepted dogs will be inserted here -->
+    </div>
+    <script>
+        function toggleMessages() {
+            const sidebar = document.getElementById('messagesSidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleProfile() {
+            const profile = document.getElementById('profileInfo');
+            profile.classList.toggle('hidden');
+        }
+
+        function displayProfile() {
+            const name = localStorage.getItem('dogName') || 'Name not available';
+            const breed = localStorage.getItem('dogBreed') || 'Breed not specified';
+            const age = localStorage.getItem('dogAge') || 'Age not specified';
+            const gender = localStorage.getItem('dogGender') || 'Gender not specified';
+            const photo = localStorage.getItem('dogPhoto') || 'https://via.placeholder.com/100';
+            
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileBreed').textContent = `Breed: ${breed}`;
+            document.getElementById('profileAge').textContent = `Age: ${age} years`;
+            document.getElementById('profileGender').textContent = `Gender: ${gender}`;
+            document.getElementById('profileImg').src = photo;
+            document.getElementById('profilePic').src = photo;
+        }
+
+        function getRandomDogImages(breed) {
+            const breedImages = {
+                'Labrador': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://i0.wp.com/blog.mascotaysalud.com/wp-content/uploads/2019/09/LABRADOR-RETRIEVER-TUMBADO.jpg?fit=865%2C540&ssl=1',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy6CvHUPjgF222Z-1dTmhYqo1WBGO4PU5FErAH5GbreK1q4DmovZ7nJkarJJI0kdHC2xo&usqp=CAU',
+                    'https://labradoresdeabantueso.com/wp-content/uploads/2023/09/Foto-Labrador-2-Guia-min.jpg',
+                    'https://cdn.pixabay.com/photo/2021/03/04/19/55/labrador-6069418_640.jpg',
+                    'https://png.pngtree.com/background/20230614/original/pngtree-large-chocolate-labrador-with-bright-blue-eyes-picture-image_3465476.jpg'
+                ],
+                'Poodle': [
+                    'https://purina.com.mx/sites/default/files/2022-10/purina-brand-que-sabes-de-los-perros-poodle.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwpJXkRoIXKcgaIB-9l700xRfww43U8guSA&s',
+                    'https://heraldodemexico.com.mx/wp-content/uploads/2020/06/caniche-1-1-1200x829.jpg',
+                    'https://lh5.googleusercontent.com/proxy/JXhUysGeSBH0fmRcxAy8yb8uWVsD-9WM5VtoLAaw2To4ZOBVZIcsQ1g-RQtSeFKSLXDxCUOjqBw366ZnF3ClUG3qud24picrU4_TsHkxsMcOA7-SPkGaIP9nIemQD9Ge7sPy1WNF_mAQADi7BcURo1iRz-FYLrg',
+                    'https://images.stockcake.com/public/f/b/7/fb70f202-9e23-48a7-96dc-c3f8448edd45_large/poodle-enjoys-ride-stockcake.jpg',
+                    'https://www.borrowmydoggy.com/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2F4ij0poqn%2Fproduction%2F3c78c099f66eaffdccc738b55735d8f92a80779d-1200x700.jpg&w=3840&q=100'
+                ],'Bulldog': [
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4YNTeFfX8k1wI7xBH_UVDKPcDDHLVw6141g&s',
+                    'https://images.pagina12.com.ar/styles/focal_3_2_960x640/public/2022-06/560550-bulldog_0.jpg?h=b10b0591&itok=_EjQxNg8',
+                    'https://blog.dogfydiet.com/wp-content/uploads/2023/05/Caracteristicas-bulldog-ingles.jpg',
+                    'https://media.cnn.com/api/v1/images/stellar/prod/cnne-1224502-220615105053-unhealthy-english-bulldogs-full-169.jpeg?c=original',
+                    'https://static.wixstatic.com/media/d1fede_bbb704c7b1c2413fa57b06a6c4aebd44~mv2.jpg/v1/fill/w_640,h_426,al_c,lg_1,q_80,enc_auto/d1fede_bbb704c7b1c2413fa57b06a6c4aebd44~mv2.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXcYxd0QreXk-aRdOdHvX4PDBjyTpif-FDhA&s'
+                ],'Beagle': [
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Shemsu_Sotis_Perun.jpg/1200px-Shemsu_Sotis_Perun.jpg',
+                    'https://images.ctfassets.net/550nf1gumh01/6zwLKAfltciBljUmEdYP3n/21191083f31cb0a43647cddbf29de913/iStock-1411469044.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ239ek9C7_g9OPCepkq61DTewGelsnv0mMZ-d-8kUD59L1ATxq8yZuUTZEzIvup00wrds&usqp=CAU',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8jiJTgb_SUUZzTDeeCheMNfCCUrAoJFzkeQ&s',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQE1PJuM5vyQwKqbKG9bxL3rLX6Z6eP4XB6g&s',
+                    'https://iccsi.com.ar/wp-content/uploads/como-saber-si-mi-beagle-es-enano.webp'
+                ],'Rottweiler': [
+                    'https://www.lavanguardia.com/files/article_main_microformat/uploads/2022/03/04/6221ad8678ba9.jpeg',
+                    'https://es.mypet.com/wp-content/uploads/sites/23/2021/03/rottweiler-no-lo-dejes-al-azar-scaled-1.jpg',
+                    'https://i.ytimg.com/vi/J2Fdt0M3P2Y/maxresdefault.jpg',
+                    'https://www.hola.com/horizon/landscape/ffea2864ee26-rottweiler-t.jpg',
+                    'https://alphapetx.com/wp-content/uploads/2022/11/comida-rottweile-1400x727.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8ULaVfyaU8wu5bxkZpXxP8ZxGPxSuzUWQ4dyhBdL_tXIvGoqwo1WcQO2bIoQkVDZBLhs&usqp=CAU'
+                ],'Dachshund': [
+                    'https://cdn.britannica.com/13/234213-050-45F47984/dachshund-dog.jpg',
+                    'https://www.thesprucepets.com/thmb/8UgAnzf_7o7i7qPPr528XtM0IW8=/2121x0/filters:no_upscale():strip_icc()/GettyImages-839279536-313d30c290584bc0a207bc6243263bd4.jpg',
+                    'https://www.dachshund-ivdd.uk/s/img/emotionheader4893957.JPG?1469570978.940px.522px',
+                    'https://content.alphapaw.com/wp-content/uploads/2021/01/butti2-1.jpg.webp',
+                    'https://cdn.britannica.com/81/12481-050-6FF2A457/dachshund-coat-hair.jpg',
+                    'https://content.nationalgeographic.com.es/medio/2024/04/10/dachshund-2_c5f1e0ae_240410205254_1280x853.jpg'
+                ],'Siberian Husky': [
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRi76AwGRCy-pmHdrRQkclgUGg_0Lf1lP2tQ&s',
+                    'https://t2.ea.ltmcdn.com/es/razas/8/0/1/husky-siberiano_108_20_600.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSu4pdBfaXREkUfQpIk4UDFtq_VB_PVo_5Qsh8R5PGfQaGAojw10aFxAVMNhRsfNTQjuFs&usqp=CAU',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGeoYzAkyO3wXe-MM_WYuxop9HeLIJMiMEuQ&s',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSalfXuOLNhAkGOo2PtspzyOcrkAofn-w9Ujw&s',
+                    'https://media-be.chewy.com/wp-content/uploads/2021/06/01091720/Siberian-Husky_FeaturedImage-1024x615.jpg'
+                ],'Golden Retriever': [
+                    'https://www.zooplus.es/magazine/wp-content/uploads/2019/04/Golden-retriever-3.jpg',
+                    'https://13630656.rocketcdn.me/wp-content/uploads/2020/01/Golden4.jpg.webp',
+                    'https://www.thesprucepets.com/thmb/baW88YsVO_JqNBNJPhCFBHbNUMM=/1500x0/filters:no_upscale():strip_icc()/dog-breed-profile-golden-retriever-1117969-hero-da398f6462704058ace0ef5ae007866d.jpeg',
+                    'https://images.saymedia-content.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cq_auto:eco%2Cw_1200/MTc0MDk2MzYxNjM1OTgwODY2/what-you-should-know-about-owning-a-golden-retriever.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdIi-nAzAAYxrAatujaCwGyg7kEAgGvKWx6A&s',
+                    'https://image.petmd.com/files/styles/978x550/public/2023-03/golden-retriever.jpg'
+                ],'German Shepherd': [
+                    'https://www.veterinaryformula.com/cdn/shop/articles/german_shepherd_issues.png?v=1631046982',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEYWy8pksOv9VWg2P61IcfQkqP4tV22Eb6Hw&s',
+                    'https://m.media-amazon.com/images/I/911P5ZgJmLL._AC_UF894,1000_QL80_.jpg',
+                    'https://www.dogtrainercollege.us/wp-content/uploads/2023/10/IMG_9970.1-edited.jpg',
+                    'https://www.ellevetsciences.com/wp-content/uploads/2023/05/German-Shepherd-1-1024x659.jpg',
+                    'https://www.rover.com/blog/wp-content/uploads/2020/06/German-Shepherd-1-1024x683.jpg'
+                ],'Chihuahua': [
+                    'https://www.elsoldemexico.com.mx/incoming/tiiv1b-perro-chihuahua/ALTERNATES/LANDSCAPE_1140/Perro%20chihuahua',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOWdaL4C5WL2rr2AgaI_jIN81A8ZdkoGaHcQ&s',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcqfSBuHy9jtcqJaIkoq8BwzF4jG8O3yYWSA&s',
+                    'https://www.kantekpremium.mx/wp-content/uploads/2023/03/perro_chihuahua.jpg',
+                    'https://www.lavanguardia.com/files/image_449_220/uploads/2022/01/10/61dcb4bd08c86.jpeg',
+                    'https://nfnatcane.es/blog/wp-content/uploads/2022/10/historia-de-la-raza-chihuahua.jpg'
+                ],'Shih Tzu': [
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1ccPenJOlg-c3nSSLROya9jq9VhBMUmGILQ&s',
+                    'https://cdn.pixabay.com/photo/2022/05/20/09/43/dog-7209095_640.jpg',
+                    'https://d2yoo3qu6vrk5d.cloudfront.net/pulzo-lite/images-resized/PP3096222A-h-o.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4kAyXhllqJmagksj0csPcvKcRlZJ_bmtJQg&s',
+                    'https://www.amarededomicanes.com/wp-content/uploads/2019/12/bonaya6.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc9X5_yVEG5wjVrleYZ5yw3dHVBbDBy0L4Iw&s'
+                ],'Cocker Spaniel': [
+                    'https://images.ctfassets.net/denf86kkcx7r/5ms5SU4yhexGdkSbnBgwm4/7a268c6cfb7a883fce3452e962a0cb8e/cockerspanielinglessegurosantevet-83',
+                    'https://hips.hearstapps.com/hmg-prod/images/gettyimages-1830847762-6620cdfbc1688.jpg?crop=1xw:0.84375xh;center,top',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUbdtMGxDiaRL0T7QRAFGcAq7VwHtEYxyCSg&s',
+                    'https://content.speakup.es/medio/2024/06/09/english-cocker-spaniel_d9fc20fe_240609114930_1280x720.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmDoj9JbPsnZD6J659h-j_9Nd_eRAfquGyxwIufLWn9vTQvolzauPzTRx7YQu20bj83Ro&usqp=CAU',
+                    'https://media-be.chewy.com/wp-content/uploads/2021/05/12131900/cocker-spaniel-5-1024x615.jpg'
+                ],'Bobtail': [
+                    'https://www.zooplus.es/magazine/wp-content/uploads/2020/05/Bobtail-o-antiguo-perro-de-pastor-ingles.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQz8xmCBvtSXY0hN-RTrOvI-E62sB_GHrn1ZA&s',
+                    'https://content.elmueble.com/medio/2023/08/03/perro-bobtail_99b23a63_230803181244_1200x630.jpg',
+                    'https://nfnatcane.es/blog/wp-content/uploads/2022/11/perro-Bobtail.jpg',
+                    'https://blog.mascotaysalud.com/wp-content/uploads/2019/09/bobtail-cachorro.jpg',
+                    'https://media.istockphoto.com/id/1449852425/es/foto/viejo-perro-pastor-ingl%C3%A9s-parado-en-un-campo-mirando-a-la-c%C3%A1mara.jpg?s=612x612&w=0&k=20&c=dp_dWlcuB7OLqKzQrK0v3I-TxOr4Zl-CfgeJ5YcZasQ='
+                ],
+                // ... Other breeds ...
+            };
+            const images = breedImages[breed];
+            return images ? images[Math.floor(Math.random() * images.length)] : 'https://via.placeholder.com/150';
+        }
+
+        function loadRandomDogs() {
+            const dogNames = [
+                'Max', 'Bella', 'Charlie', 'Lucy', 'Daisy', 'Cooper', 'Molly', 'Toby', 'Sadie', 'Bailey',
+'Rocky', 'Maggie', 'Buddy', 'Lola', 'Duke', 'Sophie', 'Jack', 'Zoey', 'Oliver', 'Chloe',
+'Buster', 'Lily', 'Murphy', 'Penny', 'Lucky', 'Ruby', 'Oscar', 'Rosie', 'Jake', 'Ginger',
+'Riley', 'Gracie', 'Harley', 'Abby', 'Tucker', 'Ellie', 'Shadow', 'Mia', 'Baxter', 'Coco',
+'Leo', 'Sasha', 'Bentley', 'Luna', 'Boomer', 'Zoe', 'Rex', 'Nala', 'Marley', 'Pepper',
+'Bruno', 'Roxy', 'Sam', 'Stella', 'Chester', 'Piper', 'Moose', 'Lilly', 'Gizmo', 'Maddie',
+'Simba', 'Kona', 'Zeus', 'Annie', 'Apollo', 'Hazel', 'Diesel', 'Belle', 'Finn', 'Jasmine',
+'Rusty', 'Layla', 'Hunter', 'Athena', 'Sammy', 'Olive', 'Blue', 'Paisley', 'Gus', 'Maya',
+'Hank', 'Holly', 'Scout', 'Missy', 'Tyson', 'Minnie', 'Ace', 'Winnie', 'Bandit', 'Macy',
+'Beau', 'Dixie', 'Jax', 'Remy', 'Copper', 'Nova', 'Chico', 'Izzy', 'Thor', 'Raven'
+            ];
+            const dogBreeds = ['Labrador', 'Poodle', 'Bulldog', 'Beagle', 'Rottweiler', 'Dachshund', 
+'Siberian Husky', 'Golden Retriever', 'German Shepherd', 'Chihuahua', 
+'Shih Tzu', 'Cocker Spaniel', 'Bobtail' ];
+            const dogGenders = ['Male', 'Female'];
+            const dogAges = ['1', '2', '3', '4', '5', '6', '7'];
+            const dogProfiles = [];
+
+            while (dogProfiles.length < 12) {
+                const randomName = dogNames[Math.floor(Math.random() * dogNames.length)];
+                if (!dogProfiles.some(profile => profile.name === randomName)) {
+                    const randomBreed = dogBreeds[Math.floor(Math.random() * dogBreeds.length)];
+                    const randomGender = dogGenders[Math.floor(Math.random() * dogGenders.length)];
+                    const randomAge = Math.floor(Math.random() * 13) + 1;
+                    const randomPhoto = getRandomDogImages(randomBreed);
+
+                    dogProfiles.push({
+                        name: randomName,
+                        breed: randomBreed,
+                        age: randomAge,
+                        gender: randomGender,
+                        photo: randomPhoto
+                    });
+                }
+            }
+
+            const matchesContainer = document.getElementById('matchesContainer');
+            matchesContainer.innerHTML = '';
+
+            dogProfiles.forEach(profile => {
+                const dogCard = document.createElement('div');
+                dogCard.classList.add('match-card');
+
+                dogCard.innerHTML = `
+                    <img src="${profile.photo}" alt="${profile.name}">
+                    <div class="info">
+                        <h2>${profile.name}</h2>
+                        <p>Breed: ${profile.breed}</p>
+                        <p>Age: ${profile.age} years</p>
+                        <p>Gender: ${profile.gender}</p>
+                    </div>
+                                    <div class="actions">
+                    <button class="accept-btn" onclick="acceptDog('${profile.name}', '${profile.breed}', ${profile.age}, '${profile.gender}', '${profile.photo}')">✔️</button>
+                    <button class="reject-btn" onclick="rejectDog(this)">✖️</button>
+                </div>
+                `;
+
+                matchesContainer.appendChild(dogCard);
+            });
+        }
+
+        function acceptDog(name, breed, age, gender, photo) {
+            const messagesSidebar = document.getElementById('messagesSidebar');
+
+            const acceptedDog = document.createElement('div');
+            acceptedDog.classList.add('match-card');
+
+            acceptedDog.innerHTML = `
+                <img src="${photo}" alt="${name}">
+                <div class="info">
+                    <h2>${name}</h2>
+                    <p>Breed: ${breed}</p>
+                    <p>Age: ${age} years</p>
+                    <p>Gender: ${gender}</p>
+                </div>
+            `;
+            loadRandomDogs(); // Load a new random dog after rejecting one
+
+            messagesSidebar.appendChild(acceptedDog);
+
+            // Optionally, remove the dog from the match list
+            const matchCard = document.querySelector(`.match-card img[alt="${name}"]`).parentElement;
+            matchCard.remove();
+        }
+
+        function rejectDog(button) {
+            const matchCard = button.closest('.match-card');
+            matchCard.remove();
+
+            // Load a new dog to replace the rejected one
+            loadRandomDogs();
+        }
+
+        window.onload = function() {
+            loadRandomDogs();
+            displayProfile();
+        }
+    </script>
+</body>
+</html>
+

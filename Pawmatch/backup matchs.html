@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches - Pawmatch</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('https://i.pinimg.com/736x/ec/91/76/ec91769b32b9ad67c12d320a5535a701.jpg'); /* Reemplaza con la URL de tu imagen de fondo */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .header {
+            background-color: #ffffff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header .profile-menu {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            cursor: pointer;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .header .profile-menu img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        .matches-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .match-card {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .match-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-bottom: 2px solid #ddd;
+        }
+        .match-card .info {
+            padding: 15px;
+            text-align: center;
+        }
+        .match-card .info h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+        .match-card .info p {
+            margin: 5px 0;
+            color: #777;
+        }
+        .match-card .actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        .match-card .actions button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .match-card .actions .match-btn {
+            color: #28a745;
+        }
+        .match-card .actions .reject-btn {
+            color: #dc3545;
+        }
+        .match-card .actions button:hover {
+            color: #007bff;
+        }
+        .messages-icon {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            background: url('https://creazilla-store.fra1.digitaloceanspaces.com/icons/3203434/facebook-messenger-icon-md.png') no-repeat center;
+            background-size: 30px 30px;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .messages-sidebar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 300px;
+            height: 50vh;
+            background: #ffffff;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            border-top: 1px solid #ddd;
+        }
+        .messages-sidebar.active {
+            transform: translateY(0);
+        }
+        .messages-sidebar .close-btn {
+            font-size: 30px;
+            cursor: pointer;
+            color: #4a90e2;
+            margin-bottom: 15px;
+            display: block;
+            text-align: right;
+        }
+        .profile-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            max-width: 300px;
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        .profile-info.hidden {
+            transform: translateX(100%);
+        }
+        .profile-info img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #4a90e2;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+        .breed-link {
+            display: block;
+            text-align: center;
+            margin: 20px;
+            font-size: 16px;
+            color: #4a90e2;
+            text-decoration: none;
+        }
+        .breed-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Matchs</h1>
+        <div class="profile-menu" onclick="toggleProfile()">
+            <img src="" id="profilePic" alt="Foto de perfil">
+        </div>
+    </div>
+    <div class="profile-info" id="profileInfo">
+        <img src="" id="profileImg" alt="Foto de perfil del usuario">
+        <h2 id="profileName">Dog name</h2>
+        <p id="profileBreed">Race</p>
+        <p id="profileAge">Age</p>
+        <p id="profileGender">Gender</p>
+    </div>
+    <div class="matches-container" id="matchesContainer">
+        <!-- Los perfiles de perros se insertarán aquí mediante JavaScript -->
+    </div>
+    <a href="breed-images.html" class="breed-link">look for images</a>
+    <div class="messages-icon" onclick="toggleMessages()">
+        <!-- El icono se carga con la URL proporcionada -->
+    </div>
+    <div class="messages-sidebar" id="messagesSidebar">
+        <span class="close-btn" onclick="toggleMessages()">✖</span>
+        <h2>Messages</h2>
+        <!-- Mensajes se insertarán aquí -->
+    </div>
+    <script>
+        function toggleMessages() {
+            const sidebar = document.getElementById('messagesSidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleProfile() {
+            const profile = document.getElementById('profileInfo');
+            profile.classList.toggle('hidden');
+        }
+
+        function displayProfile() {
+            const name = localStorage.getItem('dogName') || 'Nombre no disponible';
+            const breed = localStorage.getItem('dogBreed') || 'Raza no especificada';
+            const age = localStorage.getItem('dogAge') || 'Edad no especificada';
+            const gender = localStorage.getItem('dogGender') || 'Género no especificado';
+            const photo = localStorage.getItem('dogPhoto') || 'https://via.placeholder.com/100';
+            
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileBreed').textContent = `Race: ${breed}`;
+            document.getElementById('profileAge').textContent = `Age: ${age} years`;
+            document.getElementById('profileGender').textContent = `Gender: ${gender}`;
+            document.getElementById('profileImg').src = photo;
+            document.getElementById('profilePic').src = photo;
+        }
+
+        function getRandomDogImages(breed) {
+            const breedImages = {
+ 'Labrador': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],
+                'Poodle': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Bulldog': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Beagle': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Rottweiler': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Dachshund': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Siberian Husky': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Golden Retriever': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'German Shepherd': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Chihuahua': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Shih Tzu': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],'Cocker Spaniel': [
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg',
+                    'https://definicion.de/wp-content/uploads/2013/03/perro-1.jpg'
+                ],
+
+
+                // Agregar más razas y sus imágenes aquí
+            };
+            return breedImages[breed] || ['https://via.placeholder.com/150'];
+        }
+
+        function generateRandomDog() {
+            const dogNames = ['Max', 'Bella', 'Charlie', 'Lucy', 'Daisy', 'Cooper', 'Molly', 'Toby', 'Sadie', 'Bailey',
+'Rocky', 'Maggie', 'Buddy', 'Lola', 'Duke', 'Sophie', 'Jack', 'Zoey', 'Oliver', 'Chloe',
+'Buster', 'Lily', 'Murphy', 'Penny', 'Lucky', 'Ruby', 'Oscar', 'Rosie', 'Jake', 'Ginger',
+'Riley', 'Gracie', 'Harley', 'Abby', 'Tucker', 'Ellie', 'Shadow', 'Mia', 'Baxter', 'Coco',
+'Leo', 'Sasha', 'Bentley', 'Luna', 'Boomer', 'Zoe', 'Rex', 'Nala', 'Marley', 'Pepper',
+'Bruno', 'Roxy', 'Sam', 'Stella', 'Chester', 'Piper', 'Moose', 'Lilly', 'Gizmo', 'Maddie',
+'Simba', 'Kona', 'Zeus', 'Annie', 'Apollo', 'Hazel', 'Diesel', 'Belle', 'Finn', 'Jasmine',
+'Rusty', 'Layla', 'Hunter', 'Athena', 'Sammy', 'Olive', 'Blue', 'Paisley', 'Gus', 'Maya',
+'Hank', 'Holly', 'Scout', 'Missy', 'Tyson', 'Minnie', 'Ace', 'Winnie', 'Bandit', 'Macy',
+'Beau', 'Dixie', 'Jax', 'Remy', 'Copper', 'Nova', 'Chico', 'Izzy', 'Thor', 'Raven'
+];
+            const dogBreeds = ['Labrador', 'Poodle', 'Bulldog', 'Beagle', 'Rottweiler', 'Dachshund', 
+'Siberian Husky', 'Golden Retriever', 'German Shepherd', 'Chihuahua', 
+'Shih Tzu', 'Cocker Spaniel'];
+            const dogAges = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+            const dogGenders = ['Male', 'Female'];
+
+            const name = dogNames[Math.floor(Math.random() * dogNames.length)];
+            const breed = dogBreeds[Math.floor(Math.random() * dogBreeds.length)];
+            const age = dogAges[Math.floor(Math.random() * dogAges.length)];
+            const gender = dogGenders[Math.floor(Math.random() * dogGenders.length)];
+            const photo = getRandomDogImages(breed)[Math.floor(Math.random() * 6)];
+
+            return {
+                name,
+                breed,
+                age,
+                gender,
+                photo
+            };
+        }
+
+        function displayMatches() {
+            const matchesContainer = document.getElementById('matchesContainer');
+            matchesContainer.innerHTML = ''; // Limpiar contenido anterior
+
+            const numberOfDogs = 100;
+            for (let i = 0; i < numberOfDogs; i++) {
+                const dog = generateRandomDog();
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.innerHTML = `
+                    <img src="${dog.photo}" alt="${dog.name}">
+                    <div class="info">
+                        <h2>${dog.name}</h2>
+                        <p>${dog.breed}</p>
+                        <p>${dog.age} años</p>
+                        <p>${dog.gender}</p>
+                    </div>
+                    <div class="actions">
+                        <button class="match-btn" onclick="acceptDog('${dog.name}', '${dog.breed}', '${dog.age}', '${dog.gender}', '${dog.photo}')">✔</button>
+                        <button class="reject-btn" onclick="rejectDog(this)">✖</button>
+                    </div>
+                `;
+                matchesContainer.appendChild(card);
+            }
+        }
+
+        function acceptDog(name, breed, age, gender, photo) {
+            const messagesSidebar = document.getElementById('messagesSidebar');
+            const message = document.createElement('div');
+            message.innerHTML = `
+                <div>
+                    <img src="${photo}" alt="${name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border: 2px solid #4a90e2;">
+                    <strong>${name}</strong><br>
+                    ${breed}<br>
+                    ${age} años<br>
+                    ${gender}
+                </div>
+            `;
+            messagesSidebar.appendChild(message);
+        }
+
+        function rejectDog(button) {
+            button.closest('.match-card').remove();
+        }
+
+        // Inicializar la página
+        displayMatches();
+        displayProfile();
+    </script>
+</body>
+</html>
